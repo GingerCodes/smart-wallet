@@ -12,7 +12,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email', 'password', 'first_name', 'last_name'
     ];
 
     /**
@@ -23,4 +23,16 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+    
+    /**
+     * Get all of the groups for the user.
+     */
+    public function tasks()
+    {
+        return $this->hasMany(Group::class);
+    }
+    
+    public function get_full_name(){
+        return $this->first_name . ' ' . $this->last_name;
+    }
 }
