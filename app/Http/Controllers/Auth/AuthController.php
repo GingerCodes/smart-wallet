@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\User;
+use Auth;
 use Validator;
 use App\Http\Controllers\Controller;
 use Socialite;
@@ -70,8 +71,8 @@ use AuthenticatesAndRegistersUsers,
         ]);
     }
 
-    public function redirectToProvider() {
-        return Socialite::driver('google')->redirect();
+    public function redirectToProvider($provider) {
+        return Socialite::driver($provider)->redirect();
     }
 
     /**
@@ -79,10 +80,26 @@ use AuthenticatesAndRegistersUsers,
      *
      * @return Response
      */
-    public function handleProviderCallback() {
-        $user = Socialite::driver('google')->user();
+    public function handleProviderCallback($provider) {
+        $providerUser = Socialite::driver($provider)->user();
 
-        var_dump($user);
+        $user = User::firstOrNew(['email' => $providerUser->getEmail()]);
+        if (!$user->exists) {
+            $user->first_name = $providerUser->user['name']['givenName'];
+            $user->last_name = $providerUser->user['name']['familyName'];
+            $user->password = bcrypt(\Illuminate\Support\Str::quickRandom());
+            $user->save();
+        }
+
+        $result = Auth::login($user);
+        var_dump($result);
+        exit;
+        \Debugbar::info($result);
+        if ($result) {
+            return redirect()->intended('home');
+        } else {
+            return redirect()->intended('/');
+        }
     }
 
 }

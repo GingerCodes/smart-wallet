@@ -30,6 +30,6 @@ Route::group(['middleware' => 'web'], function () {
 
     Route::get('/home', 'HomeController@index');
 
-    Route::get('auth/google', 'Auth\AuthController@redirectToProvider');
-    Route::get('auth/google/callback', 'Auth\AuthController@handleProviderCallback');
+    Route::get('auth/{provider?}', 'Auth\AuthController@redirectToProvider');
+    Route::get('auth/{provider?}/callback', 'Auth\AuthController@handleProviderCallback');
 });
