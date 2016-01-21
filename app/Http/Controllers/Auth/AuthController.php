@@ -10,7 +10,8 @@ use Socialite;
 use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
 
-class AuthController extends Controller {
+class AuthController extends Controller
+{
     /*
       |--------------------------------------------------------------------------
       | Registration & Login Controller
@@ -24,7 +25,6 @@ class AuthController extends Controller {
 
 use AuthenticatesAndRegistersUsers,
     ThrottlesLogins;
-
     /**
      * Where to redirect users after login / registration.
      *
@@ -37,7 +37,8 @@ use AuthenticatesAndRegistersUsers,
      *
      * @return void
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('guest', ['except' => 'logout']);
     }
 
@@ -47,12 +48,13 @@ use AuthenticatesAndRegistersUsers,
      * @param  array  $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data) {
+    protected function validator(array $data)
+    {
         return Validator::make($data, [
-                    'first_name' => 'required|max:45',
-                    'last_name' => 'required|max:45',
-                    'email' => 'required|email|max:255|unique:users',
-                    'password' => 'required|confirmed|min:6',
+                'first_name' => 'required|max:45',
+                'last_name' => 'required|max:45',
+                'email' => 'required|email|max:255|unique:users',
+                'password' => 'required|confirmed|min:6',
         ]);
     }
 
@@ -62,16 +64,18 @@ use AuthenticatesAndRegistersUsers,
      * @param  array  $data
      * @return User
      */
-    protected function create(array $data) {
+    protected function create(array $data)
+    {
         return User::create([
-                    'first_name' => $data['first_name'],
-                    'last_name' => $data['last_name'],
-                    'email' => $data['email'],
-                    'password' => bcrypt($data['password']),
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'email' => $data['email'],
+                'password' => bcrypt($data['password']),
         ]);
     }
 
-    public function redirectToProvider($provider) {
+    public function redirectToProvider($provider)
+    {
         return Socialite::driver($provider)->redirect();
     }
 
@@ -80,8 +84,10 @@ use AuthenticatesAndRegistersUsers,
      *
      * @return Response
      */
-    public function handleProviderCallback($provider) {
+    public function handleProviderCallback($provider)
+    {
         $providerUser = Socialite::driver($provider)->user();
+
 
         $user = User::firstOrNew(['email' => $providerUser->getEmail()]);
         if (!$user->exists) {
@@ -91,15 +97,11 @@ use AuthenticatesAndRegistersUsers,
             $user->save();
         }
 
-        $result = Auth::login($user);
-        var_dump($result);
-        exit;
-        \Debugbar::info($result);
-        if ($result) {
-            return redirect()->intended('home');
-        } else {
+        try {
+            Auth::login($user, true);
+        } catch (Exception $ex) {
             return redirect()->intended('/');
         }
+        return redirect()->intended('home');
     }
-
 }
