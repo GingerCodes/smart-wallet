@@ -26,12 +26,14 @@ class User extends Authenticatable
     
     protected $appends = ['full_name'];
     
+    protected $dates = ['deleted_at'];
+    
     /**
      * Get all of the groups for the user.
      */
-    public function tasks()
+    public function groups()
     {
-        return $this->hasMany(Group::class);
+        return $this->hasMany(Group::class, 'owner_id');
     }
     
     public function getFullNameAttribute(){
