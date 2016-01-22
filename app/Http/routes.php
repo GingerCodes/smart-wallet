@@ -1,5 +1,4 @@
 <?php
-
 /*
   |--------------------------------------------------------------------------
   | Routes File
@@ -27,9 +26,11 @@ Route::group(['middleware' => 'web'], function () {
         return view('welcome');
     });
     Route::auth();
-
-    Route::get('/home', 'HomeController@index');
-
     Route::get('auth/{provider?}', 'Auth\AuthController@redirectToProvider');
     Route::get('auth/{provider?}/callback', 'Auth\AuthController@handleProviderCallback');
+});
+
+Route::group(['middleware' => ['web', 'auth']], function() {
+    Route::controller('home', 'HomeController');
+    Route::controller('account', 'AccountController');
 });
