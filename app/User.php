@@ -24,6 +24,8 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
     
+    protected $appends = ['full_name'];
+    
     /**
      * Get all of the groups for the user.
      */
@@ -32,7 +34,7 @@ class User extends Authenticatable
         return $this->hasMany(Group::class);
     }
     
-    public function get_full_name(){
+    public function getFullNameAttribute(){
         return $this->first_name . ' ' . $this->last_name;
     }
 }
